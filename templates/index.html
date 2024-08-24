@@ -11,10 +11,6 @@
         button { width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
         button:hover { background-color: #45a049; }
         .summary { margin-top: 20px; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        table, th, td { border: 1px solid #ddd; }
-        th, td { padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
     </style>
 </head>
 <body>
@@ -22,6 +18,7 @@
 
     <!-- Form to add new entries -->
     <form action="/" method="POST">
+        <!-- Existing form fields for adding entries -->
         <label for="year">Year:</label>
         <select name="year" id="year" required>
             <option value="2024">2024</option>
@@ -88,9 +85,9 @@
         <button type="submit" name="delete">Delete</button>
     </form>
 
-    <!-- Form to export DataFrame as Excel -->
-    <form action="/export" method="POST">
-        <button type="submit" name="export">Export to Excel</button>
+    <!-- Button to download the data as an Excel file -->
+    <form action="/download" method="GET">
+        <button type="submit">Download as Excel</button>
     </form>
 
     {% if summary %}
@@ -102,18 +99,6 @@
     {% if last_entries %}
     <h3>Last 10 Entries:</h3>
     <table>
-        <!-- <thead>
-            <tr>
-                <th>Year</th>
-                <th>Month</th>
-                <th>Day</th>
-                <th>Time</th>
-                <th>Event</th>
-                <th>Size</th>
-                <th>Post Food</th>
-                <th>Timestamp</th>
-            </tr>
-        </thead> -->
         <tbody>
             {% for entry in last_entries %}
             <tr>
