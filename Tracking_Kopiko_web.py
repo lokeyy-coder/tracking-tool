@@ -43,9 +43,8 @@ def index():
             event = request.form['event']
             size = request.form['size']
             post_food = request.form['post_food']
-
-            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
+            timestamp = f"{year}-{month[:3]}-{day} {time}"
+            
             # Load the existing Excel workbook
             workbook = load_workbook("Kopiko_Habit_Tracker.xlsx")
             sheet = workbook.active
