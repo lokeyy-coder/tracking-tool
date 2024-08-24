@@ -11,14 +11,14 @@
         button { width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
         button:hover { background-color: #45a049; }
         .summary { margin-top: 20px; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f4f4f4; }
     </style>
 </head>
 <body>
     <h2>Kopiko Habit Tracker</h2>
+
+    <!-- Form to add new entries -->
     <form action="/" method="POST">
+        <!-- Existing form fields for adding entries -->
         <label for="year">Year:</label>
         <select name="year" id="year" required>
             <option value="2024">2024</option>
@@ -27,25 +27,12 @@
 
         <label for="month">Month:</label>
         <select name="month" id="month" required>
-            <option value="January">January</option>
-            <option value="February">February</option>
-            <option value="March">March</option>
-            <option value="April">April</option>
-            <option value="May">May</option>
-            <option value="June">June</option>
-            <option value="July">July</option>
-            <option value="August">August</option>
-            <option value="September">September</option>
-            <option value="October">October</option>
-            <option value="November">November</option>
-            <option value="December">December</option>
+            <!-- Options for months -->
         </select>
 
         <label for="day">Day:</label>
         <select name="day" id="day" required>
-            {% for d in range(1, 32) %}
-            <option value="{{ d }}">{{ d }}</option>
-            {% endfor %}
+            <!-- Options for days -->
         </select>
 
         <label for="time">Time - 24 hr (HH:MM):</label>
@@ -70,7 +57,15 @@
             <option value="0">No</option>
         </select>
 
-        <button type="submit">Submit</button>
+        <button type="submit" name="submit">Submit</button>
+    </form>
+
+    <!-- Form to delete entries -->
+    <form action="/" method="POST">
+        <label for="timestamp">Timestamp to delete:</label>
+        <input type="text" name="timestamp" id="timestamp" required>
+
+        <button type="submit" name="delete">Delete</button>
     </form>
 
     {% if summary %}
@@ -80,18 +75,25 @@
     {% endif %}
 
     {% if last_entries %}
-    <h2>Last 10 Entries</h2>
+    <h3>Last 10 Entries:</h3>
     <table>
+        <thead>
+            <tr>
+                <th>Year</th>
+                <th>Month</th>
+                <th>Day</th>
+                <th>Time</th>
+                <th>Event</th>
+                <th>Size</th>
+                <th>Post Food</th>
+            </tr>
+        </thead>
         <tbody>
             {% for entry in last_entries %}
             <tr>
-                <td>{{ entry[0] }}</td>
-                <td>{{ entry[1] }}</td>
-                <td>{{ entry[2] }}</td>
-                <td>{{ entry[3] }}</td>
-                <td>{{ entry[4] }}</td>
-                <td>{{ entry[5] }}</td>
-                <td>{{ entry[6] }}</td>
+                {% for value in entry %}
+                <td>{{ value }}</td>
+                {% endfor %}
             </tr>
             {% endfor %}
         </tbody>
