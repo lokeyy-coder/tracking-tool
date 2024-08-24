@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kopiko Habit Tracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 50px; }
+        form { max-width: 300px; margin: auto; }
+        label, select, input { display: block; margin-bottom: 10px; width: 100%; }
+        button { width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        .summary { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Kopiko Habit Tracker</h2>
+    <form action="/" method="POST">
+        <label for="year">Year:</label>
+        <select name="year" id="year" required>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+        </select>
+
+        <label for="month">Month:</label>
+        <select name="month" id="month" required>
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+        </select>
+
+        <label for="day">Day:</label>
+        <select name="day" id="day" required>
+            {% for d in range(1, 32) %}
+            <option value="{{ d }}">{{ d }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="time">Time - 24 hr (HH:MM):</label>
+        <input type="time" name="time" id="time" required>
+
+        <label for="event">Event:</label>
+        <select name="event" id="event" required>
+            <option value="Eat">Eat</option>
+            <option value="Poop">Poop</option>
+        </select>
+
+        <label for="size">Size:</label>
+        <select name="size" id="size" required>
+            <option value="Small poop / Half cup">Small poop / Half cup</option>
+            <option value="Medium / Full cup">Medium / Full cup</option>
+            <option value="Large / More than 1 cup">Large / More than 1 cup</option>
+        </select>
+
+        <label for="post_food">After Food?:</label>
+        <select name="post_food" id="post_food" required>
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </select>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    {% if summary %}
+    <div class="summary">
+        {{ summary }}
+    </div>
+    {% endif %}
+</body>
+</html>
