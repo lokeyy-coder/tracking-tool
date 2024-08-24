@@ -44,7 +44,7 @@ def index():
             size = request.form['size']
             post_food = request.form['post_food']
             timestamp = f"{year}-{month[:3]}-{day} {time}"
-            
+
             # Load the existing Excel workbook
             workbook = load_workbook("Kopiko_Habit_Tracker.xlsx")
             sheet = workbook.active
@@ -73,7 +73,7 @@ def index():
         num_rows = sheet.max_row
         last_10_entries = []
         for row in range(max(num_rows - 9, 1), num_rows + 1):
-            entry = [sheet.cell(row=row, column=col).value for col in range(1, 8)]
+            entry = [sheet.cell(row=row, column=col).value for col in range(1, 9)]
             last_10_entries.append(entry)
 
         summary = "Successfully processed the request."
