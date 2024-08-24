@@ -11,6 +11,10 @@
         button { width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
         button:hover { background-color: #45a049; }
         .summary { margin-top: 20px; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table, th, td { border: 1px solid #ddd; }
+        th, td { padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
     </style>
 </head>
 <body>
@@ -18,7 +22,6 @@
 
     <!-- Form to add new entries -->
     <form action="/" method="POST">
-        <!-- Existing form fields for adding entries -->
         <label for="year">Year:</label>
         <select name="year" id="year" required>
             <option value="2024">2024</option>
@@ -83,7 +86,14 @@
         </select>
     
         <button type="submit" name="delete">Delete</button>
-    </form>    {% if summary %}
+    </form>
+
+    <!-- Form to export DataFrame as Excel -->
+    <form action="/export" method="POST">
+        <button type="submit" name="export">Export to Excel</button>
+    </form>
+
+    {% if summary %}
     <div class="summary">
         {{ summary }}
     </div>
@@ -101,6 +111,7 @@
                 <th>Event</th>
                 <th>Size</th>
                 <th>Post Food</th>
+                <th>Timestamp</th>
             </tr>
         </thead> -->
         <tbody>

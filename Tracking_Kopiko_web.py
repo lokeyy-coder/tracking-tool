@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file
+from openpyxl import load_workbook, Workbook
 import pandas as pd
-from openpyxl import Workbook
 import os
+import io
 
 app = Flask(__name__)
 
@@ -82,6 +83,21 @@ def index():
         timestamps = df['Timestamp'].tolist()
 
     return render_template('index.html', summary=summary, last_entries=last_entries, timestamps=timestamps)
+
+@app.route('/export', methods=['POST'])
+def export():
+    filename = "Kopiko_Habit_Tracker.xlsx"
+    df = pd.read_excel(filename)
+
+    # Create an in-memory output file
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False)
+    
+    output.seek(0)  # Move to the start of the BytesIO object
+
+    # Send the file as a response
+    return send_file(output, as_attachment=True, download_name="Kopiko_Habit_Tracker.xlsx", mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
