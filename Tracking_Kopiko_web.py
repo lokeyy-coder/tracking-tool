@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request
 from openpyxl import load_workbook
 
 app = Flask(__name__)
@@ -33,11 +33,22 @@ def index():
         # Save the workbook
         workbook.save("Kopiko_Habit_Tracker.xlsx")
 
-        # Pass the success message to the template
-        summary = f"Successfully submitted: Event: {event} at {time}, {day}/{month}/{year}, Size: {size}, After Food: {post_food}"
-        return render_template('index.html', summary=summary)
+        # Load the workbook again to read the last 10 entries
+        workbook = load_workbook("Kopiko_Habit_Tracker.xlsx")
+        sheet = workbook.active
 
-    return render_template('index.html', summary='')
+        # Get the last 10 entries
+        num_rows = sheet.max_row
+        last_10_entries = []
+        for row in range(max(num_rows - 9, 1), num_rows + 1):
+            entry = [sheet.cell(row=row, column=col).value for col in range(1, 8)]
+            last_10_entries.append(entry)
+
+        # Pass the success message and last 10 entries to the template
+        summary = f"Successfully submitted: Event: {event} at {time}, {day}/{month}/{year}, Size: {size}, After Food: {post_food}"
+        return render_template('index.html', summary=summary, last_entries=last_10_entries)
+
+    return render_template('index.html', summary='', last_entries=[])
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

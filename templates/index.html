@@ -11,6 +11,9 @@
         button { width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
         button:hover { background-color: #45a049; }
         .summary { margin-top: 20px; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f4f4f4; }
     </style>
 </head>
 <body>
@@ -74,6 +77,36 @@
     <div class="summary">
         {{ summary }}
     </div>
+    {% endif %}
+
+    {% if last_entries %}
+    <h2>Last 10 Entries</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Year</th>
+                <th>Month</th>
+                <th>Day</th>
+                <th>Time</th>
+                <th>Event</th>
+                <th>Size</th>
+                <th>After Food</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in last_entries %}
+            <tr>
+                <td>{{ entry[0] }}</td>
+                <td>{{ entry[1] }}</td>
+                <td>{{ entry[2] }}</td>
+                <td>{{ entry[3] }}</td>
+                <td>{{ entry[4] }}</td>
+                <td>{{ entry[5] }}</td>
+                <td>{{ entry[6] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     {% endif %}
 </body>
 </html>
