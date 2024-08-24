@@ -46,9 +46,9 @@ def index():
 
         # Pass the success message and last 10 entries to the template
         summary = f"Successfully submitted: Event: {event} at {time}, {day}/{month}/{year}, Size: {size}, After Food: {post_food}"
-        return render_template('index.html', summary=summary, last_entries=last_10_entries)
+        return render_template('index.html', summary=summary, last_entries=last_10_entries, request=request)
 
-    return render_template('index.html', summary='', last_entries=[])
+    return render_template('index.html', summary='', last_entries=[], request=request)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
