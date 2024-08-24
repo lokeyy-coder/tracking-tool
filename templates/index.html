@@ -27,12 +27,25 @@
 
         <label for="month">Month:</label>
         <select name="month" id="month" required>
-            <!-- Options for months -->
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
         </select>
 
         <label for="day">Day:</label>
         <select name="day" id="day" required>
-            <!-- Options for days -->
+            {% for d in range(1, 32) %}
+            <option value="{{ d }}">{{ d }}</option>
+            {% endfor %}
         </select>
 
         <label for="time">Time - 24 hr (HH:MM):</label>
@@ -62,8 +75,12 @@
 
     <!-- Form to delete entries -->
     <form action="/" method="POST">
-        <label for="timestamp">Timestamp to delete:</label>
-        <input type="text" name="timestamp" id="timestamp" required>
+        <label for="timestamp">Select entry to delete:</label>
+        <select name="timestamp" id="timestamp" required>
+            {% for ts in timestamps %}
+            <option value="{{ ts }}">{{ ts }}</option>
+            {% endfor %}
+        </select>
 
         <button type="submit" name="delete">Delete</button>
     </form>
