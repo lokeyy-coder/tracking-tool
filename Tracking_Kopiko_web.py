@@ -1,6 +1,26 @@
+from flask import Flask, render_template, request
+from openpyxl import load_workbook, Workbook
+import os
+
+app = Flask(__name__)
+
+# Initialize the Excel file if it doesn't exist
+def initialize_excel_file(filename):
+    if not os.path.exists(filename):
+        workbook = Workbook()
+        sheet = workbook.active
+        # Add headers if needed
+        sheet.append(["Year", "Month", "Day", "Time", "Event", "Size", "Post Food", "Timestamp"])
+        workbook.save(filename)
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     initialize_excel_file("Kopiko_Habit_Tracker.xlsx")
+
+    # Initialize response variables
+    summary = ""
+    last_entries = []
+    timestamps = []
 
     if request.method == 'POST':
         if 'delete' in request.form:
@@ -16,6 +36,7 @@ def index():
                     break
 
             workbook.save("Kopiko_Habit_Tracker.xlsx")
+            summary = "Entry deleted successfully."
 
         elif 'submit' in request.form:
             # Handle submit request
@@ -47,6 +68,7 @@ def index():
 
             # Save the workbook
             workbook.save("Kopiko_Habit_Tracker.xlsx")
+            summary = "Entry added successfully."
 
         # Load the workbook again to read the last 10 entries and timestamps
         workbook = load_workbook("Kopiko_Habit_Tracker.xlsx")
@@ -55,19 +77,20 @@ def index():
         # Get the last 10 entries
         num_rows = sheet.max_row
         last_10_entries = []
-        for row in range(max(num_rows - 9, 1), num_rows + 1):
+        for row in range(max(num_rows - 9, 2), num_rows + 1):  # Start from row 2 to avoid header
             entry = [sheet.cell(row=row, column=col).value for col in range(1, 9)]
             last_10_entries.append(entry)
 
         # Get all timestamps for deletion
         timestamps = [sheet.cell(row=row, column=8).value for row in range(2, num_rows + 1)]
 
-        summary = "Successfully processed the request."
-        return render_template('index.html', summary=summary, last_entries=last_10_entries, timestamps=timestamps)
+    else:
+        # Handle initial GET request
+        workbook = load_workbook("Kopiko_Habit_Tracker.xlsx")
+        sheet = workbook.active
+        timestamps = [sheet.cell(row=row, column=8).value for row in range(2, sheet.max_row + 1)]
 
-    # Load the workbook to populate timestamps for the initial GET request
-    workbook = load_workbook("Kopiko_Habit_Tracker.xlsx")
-    sheet = workbook.active
-    timestamps = [sheet.cell(row=row, column=8).value for row in range(2, sheet.max_row + 1)]
+    return render_template('index.html', summary=summary, last_entries=last_entries, timestamps=timestamps)
 
-    return render_template('index.html', summary='', last_entries=[], timestamps=timestamps)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
