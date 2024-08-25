@@ -1,84 +1,76 @@
-from flask import Flask, request, render_template, send_file
+from flask import Flask, render_template, request, send_file
 import sqlite3
+import os
 import pandas as pd
-from io import BytesIO
 
 app = Flask(__name__)
 
-# Database setup function
-def init_db():
-    conn = sqlite3.connect('kopiko_habit_tracker.db')
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS habits (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            year INTEGER,
-            month TEXT,
-            day INTEGER,
-            time TEXT,
-            event TEXT,
-            size TEXT,
-            post_food INTEGER,
-            timestamp TEXT
-        )
-    ''')
-    conn.commit()
-    conn.close()
+# Define your database file path
+db_file = 'kopiko_habit_tracker.db'
 
-# Initialize the database
-init_db()
+# Check if the database already exists
+db_exists = os.path.exists(db_file)
+
+# Establish connection to the SQLite database
+conn = sqlite3.connect(db_file)
+c = conn.cursor()
+
+# If the database doesn't exist, create the necessary table
+if not db_exists:
+    c.execute('''CREATE TABLE habits (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    year INTEGER,
+                    month TEXT,
+                    day INTEGER,
+                    time TEXT,
+                    event TEXT,
+                    size TEXT,
+                    post_food INTEGER
+                )''')
+    conn.commit()
+
+# Close the connection when done
+conn.close()
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    conn = sqlite3.connect('kopiko_habit_tracker.db')
-    cursor = conn.cursor()
+    conn = sqlite3.connect(db_file)
+    c = conn.cursor()
 
     if request.method == "POST":
         if "submit" in request.form:
-            year = int(request.form["year"])
-            month = request.form["month"]
-            day = int(request.form["day"])
-            time = request.form["time"]
-            event = request.form["event"]
-            size = request.form["size"]
-            post_food = int(request.form["post_food"])
-
-            cursor.execute('''
-                INSERT INTO habits (year, month, day, time, event, size, post_food, timestamp)
-                VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
-            ''', (year, month, day, time, event, size, post_food))
-
+            # Insert new record into the SQLite database
+            new_entry = (request.form["year"], request.form["month"], request.form["day"],
+                         request.form["time"], request.form["event"], request.form["size"],
+                         request.form["post_food"])
+            c.execute('''INSERT INTO habits (year, month, day, time, event, size, post_food)
+                         VALUES (?, ?, ?, ?, ?, ?, ?)''', new_entry)
             conn.commit()
-
+        
         elif "delete" in request.form:
+            # Delete selected record from the SQLite database
             timestamp = request.form["timestamp"]
-            cursor.execute("DELETE FROM habits WHERE timestamp = ?", (timestamp,))
+            c.execute('DELETE FROM habits WHERE id = ?', (timestamp,))
             conn.commit()
+        
+        elif "export" in request.form:
+            # Export the database contents to an Excel file
+            df = pd.read_sql_query("SELECT * FROM habits", conn)
+            export_file = "kopiko_habit_tracker_export.xlsx"
+            df.to_excel(export_file, index=False)
+            return send_file(export_file, as_attachment=True)
 
-    cursor.execute("SELECT * FROM habits ORDER BY timestamp DESC LIMIT 10")
-    last_entries = cursor.fetchall()
+    # Retrieve last 10 entries for display
+    c.execute('SELECT * FROM habits ORDER BY id DESC LIMIT 10')
+    last_entries = c.fetchall()
 
-    cursor.execute("SELECT timestamp FROM habits")
-    timestamps = cursor.fetchall()
-    timestamps = [ts[0] for ts in timestamps]
-
-    summary = f"{len(last_entries)} recent entries."
+    # Retrieve all timestamps for the delete dropdown
+    c.execute('SELECT id FROM habits ORDER BY id')
+    timestamps = [row[0] for row in c.fetchall()]
 
     conn.close()
 
-    return render_template("index.html", last_entries=last_entries, summary=summary, timestamps=timestamps)
-
-@app.route("/download", methods=["GET"])
-def download():
-    conn = sqlite3.connect('kopiko_habit_tracker.db')
-    df = pd.read_sql_query("SELECT * FROM habits", conn)
-    conn.close()
-
-    output = BytesIO()
-    df.to_excel(output, index=False)
-    output.seek(0)
-
-    return send_file(output, as_attachment=True, download_name="kopiko_habit_tracker.xlsx", mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    return render_template("index.html", last_entries=last_entries, timestamps=timestamps)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
